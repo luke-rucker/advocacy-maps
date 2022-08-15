@@ -11,6 +11,7 @@ import {
 import { useAsyncCallback } from "react-async-hook"
 import { setProfile } from "../db"
 import { auth } from "../firebase"
+import { Role } from "./types"
 
 const errorMessages: Record<string, string | undefined> = {
   "auth/email-already-exists": "You already have an account.",
@@ -78,6 +79,11 @@ export function useCreateUserWithEmailAndPassword() {
     }
   )
 }
+
+export type CreateOrgWithEmailAndPasswordData = Omit<
+  CreateUserWithEmailAndPasswordData,
+  "nickname"
+> & { role: Role }
 
 export type SignInWithEmailAndPasswordData = { email: string; password: string }
 

@@ -4,7 +4,8 @@ import { Col, Form, Modal, Row, Stack } from "../bootstrap"
 import { LoadingButton } from "../buttons"
 import Input from "../forms/Input"
 import PasswordInput from "../forms/PasswordInput"
-import { CreateUserWithEmailAndPasswordData } from "./hooks"
+import Select from "../forms/Select"
+import { CreateOrgWithEmailAndPasswordData } from "./hooks"
 
 export default function OrgSignUpModal({
   show,
@@ -16,7 +17,7 @@ export default function OrgSignUpModal({
     reset,
     getValues,
     formState: { errors }
-  } = useForm<CreateUserWithEmailAndPasswordData>()
+  } = useForm<CreateOrgWithEmailAndPasswordData>()
 
   const onSubmit = handleSubmit(newOrg => {
     console.log("sign up new org", newOrg)
@@ -26,12 +27,12 @@ export default function OrgSignUpModal({
     <Modal
       show={show}
       onHide={onHide}
-      aria-labelledby="sign-up-org-modal"
+      aria-labelledby="org-sign-up-modal"
       centered
       size="lg"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="sign-up-org-modal">
+        <Modal.Title id="org-sign-up-modal">
           Organization or Legislator Sign Up
         </Modal.Title>
       </Modal.Header>
@@ -39,18 +40,21 @@ export default function OrgSignUpModal({
         <Col md={11} className="mx-auto">
           <Form noValidate onSubmit={onSubmit}>
             <Stack gap={3} className="mb-4">
-              <p>
-                Your account will be authenticated and ready for use within 72
-                hours. Please be sure to verify your email address after
-                registering.
-              </p>
-
               <Input
                 label="Email"
                 type="email"
                 bottomLabel="Please use your professional or government email."
                 {...register("email", { required: "An email is required." })}
                 error={errors.email?.message}
+              />
+
+              <Select
+                label="Organization Type"
+                options={[
+                  { label: "Organization", value: "organization" },
+                  { label: "Legislator", value: "legislator" }
+                ]}
+                {...register("role")}
               />
 
               <Input
@@ -60,15 +64,6 @@ export default function OrgSignUpModal({
                   required: "A full name is required."
                 })}
                 error={errors.fullName?.message}
-              />
-
-              <Input
-                label="Nickname"
-                type="text"
-                {...register("nickname", {
-                  required: "A nickname is required."
-                })}
-                error={errors.nickname?.message}
               />
 
               <Row className="g-3">
@@ -105,7 +100,13 @@ export default function OrgSignUpModal({
               </Row>
             </Stack>
 
-            <Stack gap={4}>
+            <Stack gap={3}>
+              <p className="text-center">
+                Your account will be authenticated and ready for use within 72
+                hours. Please be sure to verify your email address after signing
+                up.
+              </p>
+
               <LoadingButton type="submit" className="w-100" loading={false}>
                 Sign Up
               </LoadingButton>
