@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Button } from "../bootstrap"
 import ForgotPasswordModal from "./ForgotPasswordModal"
+import OrgSignUpModal from "./OrgSignUpModal"
 import SignInModal from "./SignInModal"
 import SignUpModal from "./SignUpModal"
 import StartModal from "./StartModal"
@@ -10,13 +11,19 @@ interface Props {
   className?: string
 }
 
+type AuthModal =
+  | "start"
+  | "signIn"
+  | "signUp"
+  | "orgSignUp"
+  | "forgotPassword"
+  | null
+
 export default function SignInWithModal({
   label = "Log in / Sign up",
   className
 }: Props) {
-  const [currentModal, setCurrentModal] = useState<
-    "start" | "signIn" | "signUp" | "forgotPassword" | null
-  >(null)
+  const [currentModal, setCurrentModal] = useState<AuthModal>(null)
 
   const close = () => setCurrentModal(null)
 
@@ -37,7 +44,12 @@ export default function SignInWithModal({
         onHide={close}
         onForgotPasswordClick={() => setCurrentModal("forgotPassword")}
       />
-      <SignUpModal show={currentModal === "signUp"} onHide={close} />
+      <SignUpModal
+        show={currentModal === "signUp"}
+        onHide={close}
+        onOrgSignUpClick={() => setCurrentModal("orgSignUp")}
+      />
+      <OrgSignUpModal show={currentModal === "orgSignUp"} onHide={close} />
       <ForgotPasswordModal
         show={currentModal === "forgotPassword"}
         onHide={() => setCurrentModal("signIn")}

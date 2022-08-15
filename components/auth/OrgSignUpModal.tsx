@@ -1,24 +1,15 @@
-import { useEffect } from "react"
 import type { ModalProps } from "react-bootstrap"
 import { useForm } from "react-hook-form"
-import { Alert, Button, Col, Form, Modal, Row, Stack } from "../bootstrap"
+import { Col, Form, Modal, Row, Stack } from "../bootstrap"
 import { LoadingButton } from "../buttons"
-import Divider from "../Divider/Divider"
 import Input from "../forms/Input"
 import PasswordInput from "../forms/PasswordInput"
-import {
-  CreateUserWithEmailAndPasswordData,
-  useCreateUserWithEmailAndPassword
-} from "./hooks"
-import SocialSignOnButtons from "./SocialSignOnButtons"
+import { CreateUserWithEmailAndPasswordData } from "./hooks"
 
-export default function SignUpModal({
+export default function OrgSignUpModal({
   show,
-  onHide,
-  onOrgSignUpClick
-}: Pick<ModalProps, "show" | "onHide"> & {
-  onOrgSignUpClick: () => void
-}) {
+  onHide
+}: Pick<ModalProps, "show" | "onHide">) {
   const {
     register,
     handleSubmit,
@@ -27,40 +18,25 @@ export default function SignUpModal({
     formState: { errors }
   } = useForm<CreateUserWithEmailAndPasswordData>()
 
-  const createUserWithEmailAndPassword = useCreateUserWithEmailAndPassword()
-
-  useEffect(() => {
-    if (!show) {
-      reset()
-      createUserWithEmailAndPassword.reset()
-    }
-    // could not add a reference to createUserWithEmailAndPassword.reset to dep array without triggering an infinite effect, so:
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [show, reset])
-
-  const onSubmit = handleSubmit(newUser => {
-    createUserWithEmailAndPassword.execute(newUser)
+  const onSubmit = handleSubmit(newOrg => {
+    console.log("sign up new org", newOrg)
   })
 
   return (
     <Modal
       show={show}
       onHide={onHide}
-      aria-labelledby="sign-up-modal"
+      aria-labelledby="sign-up-org-modal"
       centered
       size="lg"
     >
       <Modal.Header closeButton>
-        <Modal.Title id="sign-up-modal">Sign Up</Modal.Title>
+        <Modal.Title id="sign-up-org-modal">
+          Organization or Legislator Sign Up
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Col md={11} className="mx-auto">
-          {createUserWithEmailAndPassword.error ? (
-            <Alert variant="danger">
-              {createUserWithEmailAndPassword.error.message}
-            </Alert>
-          ) : null}
-
           <Form noValidate onSubmit={onSubmit}>
             <Stack gap={3} className="mb-4">
               <Input
@@ -123,21 +99,9 @@ export default function SignUpModal({
             </Stack>
 
             <Stack gap={4}>
-              <LoadingButton
-                type="submit"
-                className="w-100"
-                loading={createUserWithEmailAndPassword.loading}
-              >
+              <LoadingButton type="submit" className="w-100" loading={false}>
                 Sign Up
               </LoadingButton>
-
-              <Divider className="px-4">or</Divider>
-
-              <SocialSignOnButtons />
-
-              <Button variant="link" onClick={onOrgSignUpClick}>
-                Organization or Legislator? Sign Up Here
-              </Button>
             </Stack>
           </Form>
         </Col>
