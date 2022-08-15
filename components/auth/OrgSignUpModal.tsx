@@ -39,10 +39,16 @@ export default function OrgSignUpModal({
         <Col md={11} className="mx-auto">
           <Form noValidate onSubmit={onSubmit}>
             <Stack gap={3} className="mb-4">
+              <p>
+                Your account will be authenticated and ready for use within 72
+                hours. Please be sure to verify your email address after
+                registering.
+              </p>
+
               <Input
                 label="Email"
                 type="email"
-                bottomLabel="Please use your official email."
+                bottomLabel="Please use your professional or government email."
                 {...register("email", { required: "An email is required." })}
                 error={errors.email?.message}
               />
