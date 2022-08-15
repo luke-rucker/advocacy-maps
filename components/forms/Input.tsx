@@ -11,12 +11,14 @@ type InputProps = Omit<
 > & {
   label: string
   error?: string
+  bottomLabel?: string
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, ...restProps }, ref) => {
+  ({ label, error, className, bottomLabel, ...restProps }, ref) => {
     const id = useId()
     const errorId = `${id}-error`
+    const bottomLabelId = `${id}-bottom-label`
 
     const hasError = Boolean(error)
 
@@ -29,12 +31,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             placeholder={label}
             isInvalid={hasError}
             aria-invalid={hasError}
-            aria-describedby={clsx(hasError && errorId)}
+            aria-describedby={clsx(hasError && errorId, bottomLabelId)}
           />
 
-          <Form.Control.Feedback type="invalid" id={errorId}>
-            {error}
-          </Form.Control.Feedback>
+          {!hasError && bottomLabel ? (
+            <Form.Text id={bottomLabelId}>{bottomLabel}</Form.Text>
+          ) : null}
+
+          {hasError ? (
+            <Form.Control.Feedback type="invalid" id={errorId}>
+              {error}
+            </Form.Control.Feedback>
+          ) : null}
         </FloatingLabel>
       </Form.Group>
     )

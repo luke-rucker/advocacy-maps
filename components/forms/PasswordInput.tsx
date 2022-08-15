@@ -65,9 +65,11 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             <FontAwesomeIcon icon={isShowing ? faEyeSlash : faEye} />
           </button>
 
-          <Form.Control.Feedback type="invalid" id={errorId}>
-            {error}
-          </Form.Control.Feedback>
+          {hasError ? (
+            <Form.Control.Feedback type="invalid" id={errorId}>
+              {error}
+            </Form.Control.Feedback>
+          ) : null}
         </FloatingLabel>
       </Form.Group>
     )

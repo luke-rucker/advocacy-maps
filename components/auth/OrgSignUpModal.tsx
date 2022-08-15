@@ -42,6 +42,7 @@ export default function OrgSignUpModal({
               <Input
                 label="Email"
                 type="email"
+                bottomLabel="Please use your official email."
                 {...register("email", { required: "An email is required." })}
                 error={errors.email?.message}
               />
