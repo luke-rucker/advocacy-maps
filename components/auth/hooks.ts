@@ -10,6 +10,7 @@ import {
 } from "firebase/auth"
 import { useAsyncCallback } from "react-async-hook"
 import { setProfile } from "../db"
+import { createUpgradeRequest } from "../db/upgradeRequests"
 import { auth } from "../firebase"
 import { Role } from "./types"
 
@@ -84,6 +85,34 @@ export type CreateOrgWithEmailAndPasswordData = Omit<
   CreateUserWithEmailAndPasswordData,
   "nickname"
 > & { role: Role }
+
+export function useCreateOrgWithEmailAndPassword() {
+  return useFirebaseFunction(
+    async ({
+      email,
+      fullName,
+      password,
+      role
+    }: CreateOrgWithEmailAndPasswordData) => {
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+
+      await Promise.all([
+        setProfile(credentials.user.uid, {
+          displayName: fullName,
+          fullName
+        }),
+        sendEmailVerification(credentials.user),
+        createUpgradeRequest(credentials.user.uid, role)
+      ])
+
+      return credentials
+    }
+  )
+}
 
 export type SignInWithEmailAndPasswordData = { email: string; password: string }
 

@@ -1,11 +1,15 @@
+import { useEffect } from "react"
 import type { ModalProps } from "react-bootstrap"
 import { useForm } from "react-hook-form"
-import { Col, Form, Modal, Row, Stack } from "../bootstrap"
+import { Alert, Col, Form, Modal, Row, Stack } from "../bootstrap"
 import { LoadingButton } from "../buttons"
 import Input from "../forms/Input"
 import PasswordInput from "../forms/PasswordInput"
 import Select from "../forms/Select"
-import { CreateOrgWithEmailAndPasswordData } from "./hooks"
+import {
+  CreateOrgWithEmailAndPasswordData,
+  useCreateOrgWithEmailAndPassword
+} from "./hooks"
 
 export default function OrgSignUpModal({
   show,
@@ -19,8 +23,19 @@ export default function OrgSignUpModal({
     formState: { errors }
   } = useForm<CreateOrgWithEmailAndPasswordData>()
 
+  const createOrgWithEmailAndPassword = useCreateOrgWithEmailAndPassword()
+
+  useEffect(() => {
+    if (!show) {
+      reset()
+      createOrgWithEmailAndPassword.reset()
+    }
+    // could not add a reference to createUserWithEmailAndPassword.reset to dep array without triggering an infinite effect, so:
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [show, reset])
+
   const onSubmit = handleSubmit(newOrg => {
-    console.log("sign up new org", newOrg)
+    createOrgWithEmailAndPassword.execute(newOrg)
   })
 
   return (
@@ -38,23 +53,32 @@ export default function OrgSignUpModal({
       </Modal.Header>
       <Modal.Body>
         <Col md={11} className="mx-auto">
+          {createOrgWithEmailAndPassword.error ? (
+            <Alert variant="danger">
+              {createOrgWithEmailAndPassword.error.message}
+            </Alert>
+          ) : null}
+
           <Form noValidate onSubmit={onSubmit}>
             <Stack gap={3} className="mb-4">
-              <Input
-                label="Email"
-                type="email"
-                bottomLabel="Please use your professional or government email."
-                {...register("email", { required: "An email is required." })}
-                error={errors.email?.message}
-              />
-
               <Select
                 label="Organization Type"
                 options={[
                   { label: "Organization", value: "organization" },
                   { label: "Legislator", value: "legislator" }
                 ]}
-                {...register("role")}
+                {...register("role", {
+                  required: "An organization type is required."
+                })}
+                error={errors.role?.message}
+              />
+
+              <Input
+                label="Email"
+                type="email"
+                bottomLabel="Please use your professional or government email."
+                {...register("email", { required: "An email is required." })}
+                error={errors.email?.message}
               />
 
               <Input
@@ -101,15 +125,19 @@ export default function OrgSignUpModal({
             </Stack>
 
             <Stack gap={3}>
+              <LoadingButton
+                type="submit"
+                className="w-100"
+                loading={createOrgWithEmailAndPassword.loading}
+              >
+                Sign Up
+              </LoadingButton>
+
               <p className="text-center">
                 Your account will be authenticated and ready for use within 72
                 hours. Please be sure to verify your email address after signing
                 up.
               </p>
-
-              <LoadingButton type="submit" className="w-100" loading={false}>
-                Sign Up
-              </LoadingButton>
             </Stack>
           </Form>
         </Col>
