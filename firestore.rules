@@ -29,6 +29,9 @@ service cloud.firestore {
       allow read: if resource.data.public || request.auth.uid == uid
       allow create, update: if request.auth.uid == uid && validRoleChange() && validPublicChange()
     }
+    match /upgradeRequests/{uid} {
+      allow create: if request.auth.uid == uid
+    }
     // Allow querying publications individually or with a collection group.
     match /{path=**}/publishedTestimony/{id} {
       // public, read-only
