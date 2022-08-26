@@ -36,6 +36,13 @@ export function checkAuth(context: https.CallableContext) {
   return uid
 }
 
+export async function requireAdmin(context: https.CallableContext) {
+  checkAuth(context)
+
+  const token = context.auth?.token
+  logger.info("token", token)
+}
+
 /** Constructs a new HTTPS error */
 export function fail(code: https.FunctionsErrorCode, message: string) {
   return new https.HttpsError(code, message)
