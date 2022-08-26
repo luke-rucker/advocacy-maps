@@ -21,7 +21,7 @@ type SelectProps = Omit<
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, options, error, className, ...restProps }, ref) => {
-    const id = useId()
+    const id = useId(restProps?.id)
     const errorId = `${id}-error`
 
     const hasError = Boolean(error)

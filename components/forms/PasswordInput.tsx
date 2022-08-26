@@ -18,7 +18,7 @@ type PasswordInputProps = Omit<
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ label, error, className, ...restProps }, ref) => {
-    const id = useId()
+    const id = useId(restProps?.id)
     const errorId = `${id}-error`
 
     const hasError = Boolean(error)
