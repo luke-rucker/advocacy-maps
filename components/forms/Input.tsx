@@ -2,48 +2,71 @@ import { useId } from "@react-aria/utils"
 import clsx from "clsx"
 import { forwardRef } from "react"
 import type { FormControlProps } from "react-bootstrap"
-import { Form, FloatingLabel } from "../bootstrap"
+import { FloatingLabel, Form } from "../bootstrap"
 
-type InputProps = Omit<
+export type InputProps = Omit<
   FormControlProps,
   // we manage these props, so we want ts to yell at you if you pass them in
-  "placeholder" | "isInvalid" | "aria-invalid" | "aria-describedby"
+  "isInvalid" | "aria-invalid" | "aria-describedby"
 > & {
   label: string
   error?: string
-  bottomLabel?: string
+  floating?: boolean
+  help?: string
+
+  /** Used when `as="textarea"` */
+  rows?: number
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, bottomLabel, ...restProps }, ref) => {
-    const id = useId()
+const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
+  (
+    {
+      label,
+      placeholder,
+      error,
+      floating = true,
+      help,
+      className,
+      ...restProps
+    },
+    ref
+  ) => {
+    const id = useId(restProps?.id)
     const errorId = `${id}-error`
-    const bottomLabelId = `${id}-bottom-label`
+    const helpId = `${id}-help`
 
     const hasError = Boolean(error)
 
+    const control = (
+      <>
+        <Form.Control
+          {...restProps}
+          ref={ref}
+          placeholder={placeholder ?? label}
+          isInvalid={hasError}
+          aria-invalid={hasError}
+          aria-describedby={clsx(hasError && errorId, help && helpId)}
+        />
+
+        <Form.Control.Feedback type="invalid" id={errorId}>
+          {error}
+        </Form.Control.Feedback>
+
+        {help && <Form.Text id={helpId}>{help}</Form.Text>}
+      </>
+    )
     return (
       <Form.Group controlId={id} className={className}>
-        <FloatingLabel controlId={id} label={label}>
-          <Form.Control
-            {...restProps}
-            ref={ref}
-            placeholder={label}
-            isInvalid={hasError}
-            aria-invalid={hasError}
-            aria-describedby={clsx(hasError && errorId, bottomLabelId)}
-          />
-
-          {!hasError && bottomLabel ? (
-            <Form.Text id={bottomLabelId}>{bottomLabel}</Form.Text>
-          ) : null}
-
-          {hasError ? (
-            <Form.Control.Feedback type="invalid" id={errorId}>
-              {error}
-            </Form.Control.Feedback>
-          ) : null}
-        </FloatingLabel>
+        {floating ? (
+          <FloatingLabel controlId={id} label={label}>
+            {control}
+          </FloatingLabel>
+        ) : (
+          <>
+            <Form.Label>{label}</Form.Label>
+            {control}
+          </>
+        )}
       </Form.Group>
     )
   }
